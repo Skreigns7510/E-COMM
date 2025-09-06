@@ -1,0 +1,64 @@
+/* src/components/Navbar.css */
+
+.citrus-navbar {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* --- Logo Styling --- */
+.citrus-logo-img {
+  height: 40px; /* Adjust size as needed */
+  filter: brightness(0) invert(1); /* This helps make a black logo appear white. Best to use a real white logo file. */
+}
+
+.citrus-logo-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* --- Centered Navigation Links Styling --- */
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.75); /* Default light text */
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: #fff; /* Brighter white on hover */
+}
+
+/* Style for the active NavLink */
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Underline effect for active link */
+.navbar-dark .navbar-nav .nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1rem; 
+  right: 1rem;
+  height: 2px;
+  background-color: #fff; /* White underline */
+}
+
+/* --- Right Side Icons Styling --- */
+.navbar-dark .navbar-nav .nav-link i {
+    font-size: 1.1rem;
+}
+
+.navbar-nav .btn-link.nav-link {
+    padding: 0; /* remove padding for button icon */
+}
+
+/* Badge styling to match example */
+.badge.rounded-pill {
+    font-size: 0.6em;
+    padding: 0.3em 0.5em;
+}
