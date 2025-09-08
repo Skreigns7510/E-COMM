@@ -1,8 +1,6 @@
-/* src/pages/Products.css */
-
 /* --- Toolbar Styles --- */
 .toolbar {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #000000;
   padding-bottom: 1rem;
 }
 
@@ -14,15 +12,16 @@
 }
 
 .view-switcher .btn.active {
-  background-color: #4CAF50; /* Green accent color */
+  background-color: #4b4b4b;
   color: white;
-  border-color: #4CAF50;
+  border-color: #000000;
 }
 
 .sort-by-container {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-wrap: nowrap;
 }
 
 .sort-by-container label {
@@ -31,7 +30,7 @@
 }
 
 .sort-by-container .form-select {
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   border: none;
   font-weight: bold;
@@ -40,8 +39,8 @@
 
 /* --- Product Card Styles --- */
 .product-card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: #ebebeb;
+  border: 1px solid #a6a6a6;
   text-align: center;
   transition: all 0.3s ease-in-out;
   overflow: hidden;
@@ -86,12 +85,12 @@
 }
 
 .offer-badge {
-  background-color: #ffc107; /* Yellow for 'OFF' */
+  background-color: #ffbf00; 
   color: #212529;
 }
 
 .sold-out-badge {
-  background-color: #343a40; /* Dark for 'SOLD OUT' */
+  background-color: #343a40;
   color: #fff;
 }
 
@@ -165,14 +164,14 @@
 
 .original-price {
   font-size: 1rem;
-  color: #999;
+  color: #999999;
   text-decoration: line-through;
 }
 
 .star-rating {
-  color: #ffc107; /* Gold color for stars */
+  color: #ffbf00;
 }
 
 .star-rating .fa-star:not(.filled) {
-  color: #e0e0e0; /* Light grey for empty stars */
+  color: #e0e0e0;
 }

@@ -1,0 +1,160 @@
+/* Inherit the font from the global styles */
+.homepage-container {
+  font-family: inherit;
+}
+
+/* === Hero Section Styling === */
+.hero-section {
+  position: relative;
+  height: 70vh;
+  min-height: 400px;
+  background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333; /* Darker text for better readability on light overlay */
+}
+
+.hero-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* A subtle white overlay to make text pop */
+  background-color: rgba(255, 255, 255, 0.6); 
+  backdrop-filter: blur(5px);
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  max-width: 600px;
+  margin: 0 auto 1.5rem auto;
+  color: #555;
+}
+
+.hero-btn {
+  display: inline-block;
+  background-color: #3498db;
+  color: #ffffff;
+  padding: 12px 30px;
+  border-radius: 50px; /* Pill shape */
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hero-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* === General Section Styling (for consistency) === */
+.section-title {
+  text-align: center;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 40px;
+}
+
+/* === Categories Section Styling === */
+.categories-section {
+  padding: 60px 0;
+  background-color: #ffffff;
+}
+
+.category-card-link {
+  text-decoration: none;
+}
+
+.category-card {
+  position: relative;
+  height: 350px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.category-card:hover .category-image {
+  transform: scale(1.05);
+}
+
+.category-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  opacity: 1; /* Always visible for better discoverability */
+  transition: background 0.3s ease;
+}
+
+.category-card:hover .category-card-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 50%);
+}
+
+.category-card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-card-title {
+    transform: translateY(0);
+}
+
+.category-explore-btn {
+  background-color: white;
+  color: #333;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-weight: 600;
+  margin-top: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.category-card:hover .category-explore-btn {
+  opacity: 1;
+  transform: translateY(0);
+}

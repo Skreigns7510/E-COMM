@@ -1,55 +1,104 @@
 import express from "express";
-import Cart from "../models/Cart.js";
-import Item from "../models/Item.js";
+import Cart from "../Models/Cart.js";
+import Item from "../Models/Item.js";
 import { authMiddleware } from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// get cart
+// GET /api/cart - Get the user's cart
 router.get("/", authMiddleware, async (req, res) => {
-  let cart = await Cart.findOne({ user: req.userId }).populate("items.item");
-  if (!cart) cart = new Cart({ user: req.userId, items: [] });
-  res.json(cart.items);
+  try {
+    const cart = await Cart.findOne({ userId: req.user.id })
+      .populate({
+        path: 'items.itemId',
+        model: 'Item'
+      });
+
+    if (!cart) {
+      return res.json([]); // Return an empty array if no cart exists
+    }
+
+    res.json(cart.items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error fetching cart." });
+  }
 });
 
-// add/update item
+// POST /api/cart - Add a new item to the cart
 router.post("/", authMiddleware, async (req, res) => {
-  const { itemId, qty } = req.body;
-  let cart = await Cart.findOne({ user: req.userId });
-  if (!cart) cart = new Cart({ user: req.userId, items: [] });
+    const { itemId, qty } = req.body;
+    const userId = req.user.id;
 
-  const idx = cart.items.findIndex(ci => ci.item.equals(itemId));
-  if (idx >= 0) cart.items[idx].qty = qty;
-  else cart.items.push({ item: itemId, qty });
+    try {
+        let cart = await Cart.findOne({ userId });
+        if (!cart) {
+            cart = new Cart({ userId, items: [] });
+        }
 
-  await cart.save();
-  res.json(cart.items);
+        const itemIndex = cart.items.findIndex(p => p.itemId.toString() === itemId);
+
+        if (itemIndex > -1) {
+            cart.items[itemIndex].qty += qty;
+        } else {
+            cart.items.push({ itemId, qty });
+        }
+
+        await cart.save();
+        res.status(200).json(cart.items);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
 });
 
-// remove item
-router.delete("/:itemId", authMiddleware, async (req, res) => {
-  let cart = await Cart.findOne({ user: req.userId });
-  if (!cart) return res.json([]);
-  cart.items = cart.items.filter(ci => !ci.item.equals(req.params.itemId));
-  await cart.save();
-  res.json(cart.items);
+// DELETE /api/cart/item/:itemId - Remove an item from the cart
+router.delete("/item/:itemId", authMiddleware, async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    let cart = await Cart.findOne({ userId });
+    if (!cart) return res.status(404).json({ message: "Cart not found." });
+
+    cart.items = cart.items.filter(ci => ci.itemId.toString() !== itemId);
+
+    await cart.save();
+    res.status(200).json(cart.items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error removing item." });
+  }
 });
 
-// merge local cart after login
+// POST /api/cart/merge - Merge local guest cart with DB cart after login
 router.post("/merge", authMiddleware, async (req, res) => {
-  const { clientCart } = req.body;
-  let cart = await Cart.findOne({ user: req.userId });
-  if (!cart) cart = new Cart({ user: req.userId, items: [] });
+  const { localCart } = req.body; 
+  const userId = req.user.id;
 
-  clientCart.forEach(c => {
-    const idx = cart.items.findIndex(ci => ci.item.equals(c.itemId));
-    if (idx >= 0) cart.items[idx].qty += c.qty;
-    else cart.items.push({ item: c.itemId, qty: c.qty });
-  });
+  try {
+    let userCart = await Cart.findOne({ userId });
+    if (!userCart) {
+      userCart = new Cart({ userId, items: [] });
+    }
 
-  await cart.save();
-  cart = await cart.populate("items.item");
-  res.json(cart.items);
+    localCart.forEach(localItem => {
+      const existingItemIndex = userCart.items.findIndex(
+        dbItem => dbItem.itemId.toString() === localItem.itemId
+      );
+      if (existingItemIndex > -1) {
+        userCart.items[existingItemIndex].qty += localItem.qty;
+      } else {
+        userCart.items.push({ itemId: localItem.itemId, qty: localItem.qty });
+      }
+    });
+
+    await userCart.save();
+    res.status(200).json({ message: "Cart merged successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error merging cart." });
+  }
 });
 
 export default router;

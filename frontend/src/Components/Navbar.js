@@ -1,13 +1,13 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import API from "../Services/api";
-import './Navbar.css'; // Make sure to create and import this CSS file
-
+import './Navbar.css';
+import logo from './logo.png'
 export default function Navbar() {
   const navigate = useNavigate();
   const [token, setToken] = useState(Boolean(localStorage.getItem("token")));
   const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadCartCount = useCallback(async () => {
     try {
@@ -26,10 +26,15 @@ export default function Navbar() {
       setCartCount(localCart.reduce((s, i) => s + (i.qty || 0), 0));
     }
   }, []);
-
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop?search=${searchQuery.trim()}`);
+    }
+  };
   useEffect(() => {
     const checkToken = () => {
-        setToken(Boolean(localStorage.getItem("token")));
+      setToken(Boolean(localStorage.getItem("token")));
     };
 
     checkToken();
@@ -47,8 +52,8 @@ export default function Navbar() {
     window.addEventListener("cartUpdated", loadCartCount);
 
     return () => {
-        window.removeEventListener("storage", onStorage);
-        window.removeEventListener("cartUpdated", loadCartCount);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("cartUpdated", loadCartCount);
     };
   }, [loadCartCount]);
 
@@ -61,20 +66,14 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark citrus-navbar px-4">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light citrus-navbar px-4">
       <div className="container-fluid">
-
-        {/* 1. Left Side: Logo */}
         <Link className="navbar-brand d-flex align-items-center" to="/">
-          <img src="https://1000logos.net/wp-content/uploads/2016/11/Chanel-logo.png" alt="Logo" className="citrus-logo-img" />
+          <img src={logo} alt="Logo" className="citrus-logo-img" />
         </Link>
-
-        {/* Hamburger Menu for Mobile */}
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
-
-        {/* 2. Center: Navigation Links */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav mx-auto">
             <li className="nav-item">
@@ -83,45 +82,57 @@ export default function Navbar() {
             <li className="nav-item">
               <NavLink className="nav-link" to="/shop">Shop</NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/about">About</NavLink>
+            <li className="nav-item dropdown">
+              <button
+                className="nav-link dropdown-toggle"
+                id="navbarDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{ background: 'none', border: 'none' }}
+              >
+                Categories
+              </button>
+              <ul className="dropdown-menu dropdown-menu-light" aria-labelledby="navbarDropdown">
+                <li><Link className="dropdown-item" to="/shop?category=Electronics">Electronics</Link></li>
+                <li><Link className="dropdown-item" to="/shop?category=Apparel">Apparel</Link></li>
+                <li><Link className="dropdown-item" to="/shop?category=Home Goods">Home Goods</Link></li>
+              </ul>
             </li>
             {token && (
-               <li className="nav-item">
+              <li className="nav-item">
                 <NavLink className="nav-link" to="/add-product">Add Product</NavLink>
               </li>
             )}
           </ul>
         </div>
-
-        {/* 3. Right Side: Icons and Actions */}
         <div className="navbar-nav d-flex flex-row align-items-center">
-            {/* Search Icon */}
-            <Link className="nav-link me-3" to="/shop" aria-label="Search">
-                <i className="fa-solid fa-magnifying-glass"></i>
-            </Link>
-
-            {/* Cart Icon */}
-            <Link className="nav-link position-relative me-3" to="/cart" aria-label="Shopping Cart">
-                <i className="fa-solid fa-cart-shopping"></i>
-                {cartCount > 0 && (
-                // CHANGED: Badge is now light with dark text for contrast
-                <span className="badge rounded-pill bg-light text-dark position-absolute top-0 start-100 translate-middle">
-                    {cartCount}
-                </span>
-                )}
-            </Link>
-            
-            {/* User/Login Icon */}
-            {token ? (
-                 <button className="btn btn-link nav-link" onClick={handleLogout} aria-label="Logout">
-                    <i className="fa-solid fa-sign-out-alt"></i>
-                </button>
-            ) : (
-                <Link className="nav-link" to="/login" aria-label="Login">
-                    <i className="fa-solid fa-user"></i>
-                </Link>
+          <form className="d-flex me-3" onSubmit={handleSearchSubmit}>
+            <input
+              className="form-control form-control-sm form-control-light"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
+          <Link className="nav-link position-relative me-3" to="/cart" aria-label="Shopping Cart">
+            <i className="fa-solid fa-cart-shopping" style={{color:'black'}}></i>
+            {cartCount > 0 && (
+              <span className="badge rounded-pill bg-light text-dark position-absolute top-0 start-100 translate-middle">
+                {cartCount}
+              </span>
             )}
+          </Link>
+          {token ? (
+            <button className="btn btn-link nav-link" onClick={handleLogout} aria-label="Logout">
+              <i className="fa-solid fa-sign-out-alt"style={{color:'black'}}></i>
+            </button>
+          ) : (
+            <Link className="nav-link" to="/login" aria-label="Login">
+              <i className="fa-solid fa-user"style={{color:'black'}}></i>
+            </Link>
+          )}
         </div>
       </div>
     </nav>

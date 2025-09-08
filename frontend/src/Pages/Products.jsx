@@ -15,7 +15,6 @@ export default function Products() {
   const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
-      // We pass the filter state to the API call
       const params = { ...filters };
       const res = await API.get("/items", { params });
       let data = res.data || [];
@@ -40,7 +39,6 @@ export default function Products() {
   }, [fetchItems]);
 
   const addToCart = async (itemId) => {
-    // Your addToCart logic remains the same
     try {
       const localCart = JSON.parse(localStorage.getItem("clientCart") || "[]");
       const found = localCart.find((c) => c.itemId === itemId);
@@ -52,10 +50,8 @@ export default function Products() {
       if (token) {
         await API.post("/cart", { itemId, qty: localCart.find((c) => c.itemId === itemId).qty });
       }
-      
-      // Consider a more modern notification system than alert() in the future
       alert("Added to cart ✅"); 
-      window.dispatchEvent(new Event("cartUpdated")); // Use the custom event from Navbar
+      window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
       console.error(err);
       alert("Could not add to cart");
@@ -63,7 +59,6 @@ export default function Products() {
   };
 
   const renderStars = (rating = 5) => {
-    // Placeholder for star ratings, as it wasn't in your original data
     return (
       <div className="star-rating">
         {[...Array(5)].map((_, i) => (
@@ -98,8 +93,6 @@ export default function Products() {
           </select>
         </div>
       </div>
-
-      {/* Collapsible Filter Section */}
       {showFilters && (
         <div className="filter-section card card-body mb-4">
              <div className="row g-2">
@@ -136,8 +129,7 @@ export default function Products() {
               <div className="product-card">
                 {/* Product Image and Badges */}
                 <div className="product-image-container">
-                   {/* This assumes your API provides an 'image' field */}
-                  <Link to={`/product/${item._id}`}> {/* Link to a product detail page */}
+                  <Link to={`/product/${item._id}`}> 
                     <img
                       src={item.image ? `http://localhost:7000${item.image}` : "https://i.imgur.com/gJ5hJ6h.png"}
                       alt={item.name || "product"}
@@ -148,7 +140,7 @@ export default function Products() {
                     {item.mrp && item.mrp > item.price && (
                       <span className="badge offer-badge">OFF</span>
                     )}
-                    {item.stock === 0 && ( // Assuming you have a 'stock' field
+                    {item.stock === 0 && (
                         <span className="badge sold-out-badge">SOLD OUT</span>
                     )}
                   </div>

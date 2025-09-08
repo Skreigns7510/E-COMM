@@ -1,0 +1,89 @@
+/* === Main Footer Styling === */
+.site-footer {
+  background-color: #f8f9fa; /* Consistent light gray background */
+  padding: 50px 0 0;
+  font-size: 15px;
+  color: #7f8c8d; /* Muted text color */
+  border-top: 1px solid #e9ecef;
+}
+
+.footer-heading {
+  color: #2c3e50; /* Dark, soft blue-gray for headings */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.footer-text {
+  line-height: 1.7;
+}
+
+/* === Links Styling === */
+.footer-links {
+  margin: 0;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: #7f8c8d;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out, padding-left 0.2s ease-in-out;
+  position: relative;
+}
+
+.footer-links a:hover {
+  color: #3498db; /* Theme accent color */
+  padding-left: 5px;
+}
+
+/* === Social Icons Styling === */
+.social-icons {
+  display: flex;
+  gap: 15px; /* Space between icons */
+  margin-top: 15px;
+}
+
+.social-icons a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #7f8c8d;
+  font-size: 16px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.social-icons a:hover {
+  background-color: #3498db; /* Theme accent color */
+  color: #ffffff;
+  transform: translateY(-3px);
+}
+
+/* === Copyright Section === */
+.footer-copyright {
+  text-align: center;
+  padding: 25px 0;
+  margin-top: 40px;
+  background-color: #e9ecef; /* Slightly darker gray for separation */
+  color: #95a5a6;
+}
+
+.footer-copyright a {
+  color: #34495e; /* Darker link color */
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-copyright a:hover {
+  color: #3498db;
+}

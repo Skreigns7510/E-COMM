@@ -1,13 +1,13 @@
-// src/pages/Cart.jsx
+// src/Pages/Cart.jsx
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 import API from "../Services/api";
+import { toast } from 'react-hot-toast'; // Import toast for notifications
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Your logic for loadCart, updateQty, removeItem remains the same
   const loadCart = useCallback(async () => {
     try {
         setLoading(true);
@@ -17,38 +17,52 @@ export default function Cart() {
         if (!token) {
             const localCart = JSON.parse(localStorage.getItem("clientCart") || "[]");
             if (localCart.length > 0) {
-                 const itemDetailsPromises = localCart.map(c => API.get(`/items/${c.itemId}`));
-                 const itemDetailsResponses = await Promise.all(itemDetailsPromises);
-                 itemsData = itemDetailsResponses.map((res, index) => ({
-                     ...res.data,
-                     qty: localCart[index].qty,
-                 }));
+                const itemDetailsPromises = localCart.map(c => API.get(`/items/${c.itemId}`));
+                const itemDetailsResponses = await Promise.all(itemDetailsPromises);
+                itemsData = itemDetailsResponses.map((res, index) => ({
+                    ...res.data,
+                    qty: localCart[index].qty,
+                }));
             }
         } else {
             const res = await API.get("/cart");
-            // The API for logged-in users should return items with product details populated
-            itemsData = res.data.map(cartItem => ({...cartItem.itemId, _id: cartItem.itemId._id, qty: cartItem.qty}));
+            // Simplified and corrected mapping
+            itemsData = res.data.map(cartItem => ({
+                ...cartItem.itemId,
+                qty: cartItem.qty
+            }));
         }
         setCartItems(itemsData);
     } catch (err) {
         console.error("Failed to load cart:", err);
+        toast.error("Could not load your cart.");
         setCartItems([]);
     } finally {
         setLoading(false);
     }
   }, []);
 
-  useEffect(() => { loadCart(); }, [loadCart]);
+  useEffect(() => { 
+    loadCart();
+    // Listen for the custom event to reload cart when updated from other pages
+    window.addEventListener('cartUpdated', loadCart);
+    return () => {
+        window.removeEventListener('cartUpdated', loadCart);
+    }
+  }, [loadCart]);
 
   const updateQty = async (itemId, qty) => {
-    if (qty < 1) return; // Prevent quantity from being less than 1
+    if (qty < 1) return removeItem(itemId); // If qty is 0, remove the item
+
+    const originalCart = [...cartItems];
     const newCartItems = cartItems.map(item => item._id === itemId ? { ...item, qty } : item);
-    setCartItems(newCartItems);
+    setCartItems(newCartItems); // Optimistic update
     
     const token = localStorage.getItem("token");
     try {
       if (token) {
-        await API.post("/cart", { itemId, qty });
+        // ✅ CORRECTED API ROUTE: Using PUT for updating a specific item
+        await API.put(`/cart/item/${itemId}`, { qty });
       } else {
         const localCart = newCartItems.map(i => ({ itemId: i._id, qty: i.qty }));
         localStorage.setItem("clientCart", JSON.stringify(localCart));
@@ -56,24 +70,31 @@ export default function Cart() {
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
       console.error("Failed to update quantity", error);
+      toast.error("Failed to update quantity.");
+      setCartItems(originalCart); // ✅ Revert on error
     }
   };
 
   const removeItem = async (itemId) => {
+    const originalCart = [...cartItems];
     const newCartItems = cartItems.filter(item => item._id !== itemId);
-    setCartItems(newCartItems);
+    setCartItems(newCartItems); // Optimistic update
 
     const token = localStorage.getItem("token");
     try {
         if (token) {
-            await API.delete(`/cart/${itemId}`);
+            // ✅ CORRECTED API ROUTE: Using DELETE for a specific item
+            await API.delete(`/cart/item/${itemId}`);
         } else {
             const localCart = newCartItems.map(i => ({ itemId: i._id, qty: i.qty }));
             localStorage.setItem("clientCart", JSON.stringify(localCart));
         }
+        toast.success("Item removed from cart.");
         window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
         console.error("Failed to remove item", error);
+        toast.error("Failed to remove item.");
+        setCartItems(originalCart); // ✅ Revert on error
     }
   };
 
@@ -85,7 +106,7 @@ export default function Cart() {
     <div className="text-center py-5 text-muted">
         <h2>Your Cart is Empty</h2>
         <p>Looks like you haven't added anything to your cart yet.</p>
-        <Link to="/" className="btn btn-primary mt-3">Continue Shopping</Link>
+        <Link to="/shop" className="btn btn-primary mt-3">Continue Shopping</Link>
     </div>
   );
 
@@ -108,17 +129,17 @@ export default function Cart() {
                 <p className="mb-1 fw-bold fs-5">₹{item.price}</p>
               </div>
               <div className="d-flex align-items-center mt-3 mt-md-0">
-                 <input 
-                    type="number" 
-                    className="form-control form-control-dark text-center" 
-                    value={item.qty} 
-                    min={1} 
-                    style={{ width: '70px' }}
-                    onChange={e => updateQty(item._id, parseInt(e.target.value))} 
-                 />
-                 <button className="btn btn-outline-danger ms-3" onClick={() => removeItem(item._id)}>
-                    <i className="fa-solid fa-trash"></i>
-                 </button>
+                   <input 
+                     type="number" 
+                     className="form-control form-control-dark text-center" 
+                     value={item.qty} 
+                     min={1} 
+                     style={{ width: '70px' }}
+                     onChange={e => updateQty(item._id, parseInt(e.target.value))} 
+                   />
+                   <button className="btn btn-outline-danger ms-3" onClick={() => removeItem(item._id)}>
+                     <i className="fa-solid fa-trash"></i>
+                   </button>
               </div>
             </div>
           ))}
@@ -140,7 +161,7 @@ export default function Cart() {
               <span className="text-white">₹{total.toFixed(2)}</span>
             </div>
             <div className="d-grid mt-4">
-                <button className="btn btn-primary btn-lg">Proceed to Checkout</button>
+              <button className="btn btn-primary btn-lg">Proceed to Checkout</button>
             </div>
           </div>
         </div>
